@@ -72,6 +72,15 @@ const App = () => {
     }
   }
   
+  const handleDelete = async (id: number) => {
+    try {
+      await api.delete(`/transactions/${id}`)
+      fetchTransactions()
+    } catch (error) {
+      console.error('Error deleting transaction: ', error)
+    }
+  }
+
   
   useEffect(() => {
     fetchTransactions()
@@ -128,13 +137,15 @@ const App = () => {
 
           <button type='submit' className='btn btn-primary'>
             Submit
-          </button>
+          </button> 
+          
 
         </form>
 
         <table className='table table-striped table-bordered table-hover'>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Amount</th>
             <th>Category</th>
             <th>Description</th>
@@ -145,11 +156,17 @@ const App = () => {
         <tbody>
           { transactions.map((transaction) => (
             <tr key={ transaction.id }>
+              <td>{transaction.id}</td>
               <td>{transaction.amount}</td>
               <td>{transaction.category}</td>
               <td>{transaction.description}</td>
               <td>{transaction.is_income ? 'Yes' : 'No'}</td>
               <td>{transaction.date}</td>
+              <td>
+              <button type='button' className='btn btn-danger m-2' onClick={() => handleDelete(transaction.id)}>
+                Delete
+              </button>
+              </td>
             </tr>
           ))}
         </tbody>
