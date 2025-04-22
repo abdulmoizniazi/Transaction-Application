@@ -132,7 +132,7 @@ const App = () => {
             <label htmlFor="date" className='form-label'>
               Date
             </label>
-            <input type="text" className='form-control' id='date' name='date' onChange={handleInputChange} value={formData.date} />
+            <input type="date" className='form-control' id='date' name='date' onChange={handleInputChange} value={formData.date} />
           </div>
 
           <button type='submit' className='btn btn-primary'>
@@ -161,7 +161,7 @@ const App = () => {
               <td>{transaction.category}</td>
               <td>{transaction.description}</td>
               <td>{transaction.is_income ? 'Yes' : 'No'}</td>
-              <td>{transaction.date}</td>
+              <td>{new Date(transaction.date).toLocaleDateString()}</td>
               <td>
               <button type='button' className='btn btn-danger m-2' onClick={() => handleDelete(transaction.id)}>
                 Delete

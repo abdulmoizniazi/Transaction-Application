@@ -1,11 +1,14 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from datetime import date
 from database import SessionLocal, engine
 from typing import Annotated, List
 from sqlalchemy.orm import Session
 import models 
 
+# from database import get_session, engine, create_db_and_tables
+# from sqlmodel import Session
 
 app = FastAPI()
 
@@ -31,7 +34,7 @@ class TransactionBase(BaseModel):
     category: str
     description: str
     is_income: bool
-    date: str
+    date: date
 
 class TransactionModel(TransactionBase):
     id: int
@@ -49,18 +52,28 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+# db_dependency = Annotated[Session, Depends(get_session)]
+
 
 models.Base.metadata.create_all(bind=engine)
+# create_db_and_tables()
 
+
+
+# TransactionModel & TransactionBase ---> Transaction
 @app.post('/transactions/', response_model=TransactionModel)
 async def create_transaction(transaction: TransactionBase, db: db_dependency):
-    db_transaction = models.Transaction(**transaction.model_dump())
+    db_transaction = models.Transaction(**transaction.model_dump()) # this line would be eliminated
     db.add(db_transaction)
+    # db.add(transaction)
     db.commit()
     db.refresh(db_transaction)
+    # db.refresh(transaction)
     return db_transaction
+    # return transaction
 
 
+# @app.get('/transactions/', response_model=List[Transaction])
 @app.get('/transactions/', response_model=List[TransactionModel])
 async def read_transactions(db: db_dependency, skip: int=0, limit: int=100):
     transactions = db.query(models.Transaction).offset(skip).limit(limit).all()
